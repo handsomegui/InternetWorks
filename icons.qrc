@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file>broken.png</file>
+    <file>ok.png</file>
+  </qresource>
+</RCC>

@@ -11,7 +11,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 setup(name = "InternetWorks",
-      version = "0.0.1",
+      version = "0.0.2",
       description = "Internet Online/Offline indicator.",
       options = {"build_exe": build_exe_options},
       executables = [Executable("InternetWorks.py", base=base)])

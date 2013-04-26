@@ -4,17 +4,17 @@
 
 
 import sys
-from subprocess import call
 from time import sleep
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QThread, SIGNAL
 
+import requests
 import icons
 
 
-cmd_str, opt1, opt2, opt3 = 'ping', '-q', '-o', '-t 1'
-check_target = ['www.apple.com']    # Add targets as you want.
+# Replace target as you want.
+CHECK_TARGET = 'http://www.google.com'
 
 
 class SysTrayIcon(QSystemTrayIcon):
@@ -58,29 +58,31 @@ class SysTrayIcon(QSystemTrayIcon):
 
 
 class CheckThread(QThread):
-    def ping_it(self, domain_name):
-        ping_cmd = "%s %s %s %s %s" % (cmd_str, opt1, opt2, opt3, domain_name)
-        ret = call(ping_cmd, shell=True)
-        if ret == 0:    # Ping successfully.
-            results_list.append(1)
+    def check_connection(self):
+        self.r = None
+        try:
+            self.r = requests.get(CHECK_TARGET, timeout=2.5)
+            if self.r.status_code == 200:
+                return 1
+            else:
+                return 0
+        except:
+            return 0
 
     def run(self):
-        global results_list
-        results_list = []
-
         while 1:
-            sleep(1.5)
+            sleep(2)
 
             # Trigger the checking.
-            map(self.ping_it, check_target)
-
-            if results_list:
+            ret = self.check_connection()
+            if ret:
                 self.emit(SIGNAL('inet'), 'OK')
             else:
                 self.emit(SIGNAL('inet'), 'FAILED')
 
-            # Clear the list.
-            results_list = []
+            # Clear the cache.
+            if self.r:
+                del self.r
 
 
 if __name__ == '__main__':
